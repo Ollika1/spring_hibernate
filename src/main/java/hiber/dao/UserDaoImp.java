@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class UserDaoImp implements UserDao {
@@ -32,15 +33,18 @@ public class UserDaoImp implements UserDao {
    }
    @Override
    @SuppressWarnings("unchecked")
-   public User getUserWithCar(String model, int series) {
+   public Optional<User> getUserWithCar(String model, int series){
       try {
-         TypedQuery<User> query=sessionFactory.getCurrentSession().createQuery(
+         TypedQuery<User>
+                 query=sessionFactory.getCurrentSession().createQuery(
                  "select a from User a WHERE a.car.model=:model AND a.car.series=:series");
          query.setParameter("model",model);
          query.setParameter("series",series);
-         return query.getSingleResult();
+         return Optional.of(query.getSingleResult());
       } catch (NoResultException e){
-         return null;
+         System.out.println("Пользователь не найден. Проверьте данные запроса.");
+         return Optional.empty();
+        //throw new NoResultException("User не найден");
       }
    }
 
